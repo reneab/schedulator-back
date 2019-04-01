@@ -61,16 +61,16 @@ app.get('/schedules/find', (req, res) => {
             else {res.send(data);}
         });
     } else {
-        res.status(404).send('Please specify either a room or teacher');
+        res.status(404).send('Please specify either a room, a batch or a teacher in request parameters');
     }
 });
 
+// adding a new schedule entry
 app.post('/schedules/save', (req, res) => {
     console.log('Received POST request on ' + req.url + ' with content ' + JSON.stringify(req.body));
     const mod = new model(req.body);
     
     // Find first to see if no conflicts on the time slot
-    // const toLook = {teacher: mod.teacher, room: mod.room, teacher: mod.teacher, time: mod.time, batch: mod.batch};
     model.find({time: mod.time}, (err, data) => {
         if (err) {res.send(err);}
         else if (data) {
@@ -95,6 +95,7 @@ app.post('/schedules/save', (req, res) => {
 
 });
 
+// deleting entry by ID
 app.delete('/schedules/:id', (req, res) => {
     console.log('Received DELETE request on ' + req.url);
     model.deleteOne({_id: req.params.id}, err => {
@@ -103,6 +104,7 @@ app.delete('/schedules/:id', (req, res) => {
     }) 
 });
 
+// launching the app
 app.listen('3000', function() {
     console.log('Schedulator listening on port 3000...');
 })
