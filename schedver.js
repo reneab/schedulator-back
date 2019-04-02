@@ -38,7 +38,7 @@ var model = mongo.model('schedules', ScheduleSchema, 'schedules');
 app.get('/schedules/all', (req, res) => {
     console.log('Received request: ' + req.url);
     model.find({}, function(err, data) {
-        if (err) {res.send(err);}
+        if (err) {res.status(500).send(err.message);}
         else {res.send(data);}
     });
 });
@@ -48,21 +48,21 @@ app.get('/schedules/find', (req, res) => {
     console.log('Received request: ' + req.url + ' with search query: ' + req.query);
     if (req.query.teacher) {
         model.find({teacher: req.query.teacher}, function(err, data) {
-            if (err) {res.send(err);}
+            if (err) {res.status(500).send(err.message);}
             else {res.send(data);}
         });
     } else if (req.query.room) {
         model.find({room: req.query.room}, function(err, data) {
-            if (err) {res.send(err);}
+            if (err) {res.status(500).send(err.message);}
             else {res.send(data);}
         });
     } else if (req.query.batch) {
         model.find({batch: req.query.batch}, function(err, data) {
-            if (err) {res.send(err);}
+            if (err) {res.status(500).send(err.message);}
             else {res.send(data);}
         });
     } else {
-        res.status(404).send('Please specify either a room, a batch or a teacher in request parameters');
+        res.status(500).send('Please specify either a room, a batch or a teacher in request parameters');
     }
 });
 
@@ -73,7 +73,7 @@ app.post('/schedules/save', (req, res) => {
     
     // Find first to see if no conflicts on the time slot
     model.find({time: mod.time}, (err, data) => {
-        if (err) {res.send(err);}
+        if (err) {res.status(500).send(err.message);}
         else if (data) {
             var conflicts = [];
             data.forEach(element => {
@@ -83,12 +83,15 @@ app.post('/schedules/save', (req, res) => {
             });
             if (conflicts.length > 0) {
                 console.log('Found these conflicting entries: ' + JSON.stringify(conflicts));
-                res.send('Slot is already taken');
+                res.status(500).send('Slot is already taken');
             } else {
-                console.log('No conflicting record found. Inserting...')
+                console.log('No conflicting record found. Inserting...');
                 mod.save((err, data) => {
-                    if (err) {res.send(err);}
-                    else {res.send('Record successfully inserted: ' + data);}
+                    if (err) {res.status(500).send(err.message);}
+                    else {
+                    	console.log('Record successfully inserted: ' + JSON.stringify(data));
+                    	res.status(200).send('Successfully inserted!');
+                    }
                 });
             }
         }
@@ -100,8 +103,8 @@ app.post('/schedules/save', (req, res) => {
 app.delete('/schedules/:id', (req, res) => {
     console.log('Received DELETE request on ' + req.url);
     model.deleteOne({_id: req.params.id}, err => {
-        if (err) {res.send(err);}
-        else {res.send('Record successfully deleted!');}
+        if (err) {res.status(500).send(err.message);}
+        else {res.status(200).send('Record successfully deleted!');}
     }) 
 });
 
