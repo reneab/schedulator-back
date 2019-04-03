@@ -24,12 +24,31 @@ app.use(function(req, res, next) {
     next();
 });
 
+const SettingsSchema = new mongo.Schema({
+    timeslots: [String],
+    batches: [String],
+    rooms: [String],
+    teachers: [String],
+}, {versionKey: false});
+
+var settingsModel = mongo.model('settings', SettingsSchema, 'settings');
+
+// get settings data
+app.get('/settings/all', (req, res) => {
+    console.log('Received request: ' + req.url);
+    // let's assume for now there is only one entry in settings collection
+    settingsModel.findOne({}, function(err, data) {
+        if (err) {res.status(500).send(err.message);}
+        else {res.send(data);}
+    });
+});
+
 const ScheduleSchema = new mongo.Schema({
-    time: {type: String},
-    batch: {type: String},
-    room: {type: String},
-    teacher: {type: String},
-    subject: {type: String}
+    time: String,
+    batch: String,
+    room: String,
+    teacher: String,
+    subject: String
 }, {versionKey: false});
 
 var model = mongo.model('schedules', ScheduleSchema, 'schedules');
