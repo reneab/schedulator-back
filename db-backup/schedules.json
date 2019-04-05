@@ -1,0 +1,8 @@
+{"_id":{"$oid":"5ca418e659a38f1a77630a8d"},"time":"June 10-14 PM","batch":"2020-C","teacher":"Jun Rey","room":"Comlab-2","subject":null}
+{"_id":{"$oid":"5ca4258f59a38f1a77630a94"},"time":"June 3-7 AM","batch":"2020-B","teacher":"Kenneth","room":"Comlab-2","subject":null}
+{"_id":{"$oid":"5ca425ee59a38f1a77630a97"},"time":"July 29-2 PM","batch":"2020-A","teacher":"Quentin","room":"Comlab-1","subject":null}
+{"_id":{"$oid":"5ca426bf59a38f1a77630a98"},"time":"July 22-26 AM","batch":"2020-A","teacher":"Quentin","room":"Comlab-1","subject":null}
+{"_id":{"$oid":"5ca426cb59a38f1a77630a9b"},"time":"July 22-26 AM","batch":"2021-A","teacher":"Jun Rey","room":"LB442","subject":null}
+{"_id":{"$oid":"5ca44b0cf4c33254a12dbdfd"},"time":"June 10-14 AM","batch":"2020-A","teacher":"Quentin","room":"Comlab-1","subject":null}
+{"_id":{"$oid":"5ca44da3f4c33254a12dbe03"},"time":"June 3-7 AM","batch":"2020-C","teacher":"Laurent","room":"LB442","subject":"PLT lol"}
+{"_id":{"$oid":"5ca5d35638718319caa74b30"},"time":"July 8-12 AM","batch":"2020-A","teacher":"Quentin","room":"Comlab-1","subject":"branlette"}
