@@ -1,0 +1,24 @@
+{
+  "name": "schedulator-back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "schedver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reneab/schedulator-back.git"
+  },
+  "author": "rene",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/reneab/schedulator-back/issues"
+  },
+  "homepage": "https://github.com/reneab/schedulator-back#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.22"
+  }
+}
