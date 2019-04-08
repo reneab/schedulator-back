@@ -96,13 +96,13 @@ app.post('/schedules/save', (req, res) => {
         else if (data) {
             var conflicts = [];
             data.forEach(element => {
-                if (element.teacher == mod.teacher || element.batch === mod.batch || element.room == mod.room) {
-                    conflicts.push(element);
-                }
+                if (element.teacher == mod.teacher) {conflicts.push(mod.teacher + ' is already taken')}
+                if (element.batch === mod.batch) {conflicts.push('Batch ' + mod.batch + ' is already taken')}
+                if (element.room == mod.room) {conflicts.push(mod.room + ' is already taken')}
             });
             if (conflicts.length > 0) {
-                console.log('Found these conflicting entries: ' + JSON.stringify(conflicts));
-                res.status(500).send('Slot is already taken');
+                console.log('Found the following conflicts: ' + JSON.stringify(conflicts));
+                res.status(500).send(conflicts.join('. ') + '.');
             } else {
                 console.log('No conflicting record found. Inserting...');
                 mod.save((err, data) => {
