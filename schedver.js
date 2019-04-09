@@ -50,7 +50,10 @@ app.post('/settings/save', (req, res) => {
     console.log('Updating settings: ' + JSON.stringify(toInsert));
     settingsModel.findOneAndUpdate({}, toInsert, (err) => {
         if (err) {res.status(500).send(err.message);}
-        else {res.status(200).send('Settings successfully updated!');}
+        else {
+            console.log('Settings successfully updated!');
+            res.status(200).send('Settings successfully updated!');
+        }
     });
 });
 
@@ -62,12 +65,12 @@ const ScheduleSchema = new mongo.Schema({
     subject: String
 }, {versionKey: false});
 
-var model = mongo.model('schedules', ScheduleSchema, 'schedules');
+var scheduleModel = mongo.model('schedules', ScheduleSchema, 'schedules');
 
 // get all schedule data
 app.get('/schedules/all', (req, res) => {
     console.log('Received request: ' + req.url);
-    model.find({}, function(err, data) {
+    scheduleModel.find({}, function(err, data) {
         if (err) {res.status(500).send(err.message);}
         else {res.send(data);}
     });
@@ -77,17 +80,17 @@ app.get('/schedules/all', (req, res) => {
 app.get('/schedules/find', (req, res) => {
     console.log('Received request: ' + req.url + ' with search query: ' + req.query);
     if (req.query.teacher) {
-        model.find({teacher: req.query.teacher}, function(err, data) {
+        scheduleModel.find({teacher: req.query.teacher}, function(err, data) {
             if (err) {res.status(500).send(err.message);}
             else {res.send(data);}
         });
     } else if (req.query.room) {
-        model.find({room: req.query.room}, function(err, data) {
+        scheduleModel.find({room: req.query.room}, function(err, data) {
             if (err) {res.status(500).send(err.message);}
             else {res.send(data);}
         });
     } else if (req.query.batch) {
-        model.find({batch: req.query.batch}, function(err, data) {
+        scheduleModel.find({batch: req.query.batch}, function(err, data) {
             if (err) {res.status(500).send(err.message);}
             else {res.send(data);}
         });
@@ -99,24 +102,24 @@ app.get('/schedules/find', (req, res) => {
 // adding a new schedule entry
 app.post('/schedules/save', (req, res) => {
     console.log('Received POST request on ' + req.url + ' with content ' + JSON.stringify(req.body));
-    const mod = new model(req.body);
+    const toInsert = new scheduleModel(req.body);
     
     // Find first to see if no conflicts on the time slot
-    model.find({time: mod.time}, (err, data) => {
+    scheduleModel.find({time: toInsert.time}, (err, data) => {
         if (err) {res.status(500).send(err.message);}
         else if (data) {
             var conflicts = [];
-            data.forEach(element => {
-                if (element.teacher == mod.teacher) {conflicts.push(mod.teacher + ' is already taken')}
-                if (element.batch === mod.batch) {conflicts.push('Batch ' + mod.batch + ' is already taken')}
-                if (element.room == mod.room) {conflicts.push(mod.room + ' is already taken')}
+            data.forEach(e => {
+                if (e.teacher == toInsert.teacher) {conflicts.push(e.teacher + ' is already busy')}
+                if (e.batch === toInsert.batch) {conflicts.push('Batch ' + e.batch + ' is already busy')}
+                if (e.room == toInsert.room) {conflicts.push(e.room + ' is already taken')}
             });
             if (conflicts.length > 0) {
                 console.log('Found the following conflicts: ' + JSON.stringify(conflicts));
                 res.status(500).send(conflicts.join('. ') + '.');
             } else {
                 console.log('No conflicting record found. Inserting...');
-                mod.save((err, data) => {
+                toInsert.save((err, data) => {
                     if (err) {res.status(500).send(err.message);}
                     else {
                     	console.log('Record successfully inserted: ' + JSON.stringify(data));
@@ -132,7 +135,7 @@ app.post('/schedules/save', (req, res) => {
 // deleting entry by ID
 app.delete('/schedules/:id', (req, res) => {
     console.log('Received DELETE request on ' + req.url);
-    model.deleteOne({_id: req.params.id}, err => {
+    scheduleModel.deleteOne({_id: req.params.id}, err => {
         if (err) {res.status(500).send(err.message);}
         else {res.status(200).send('Record successfully deleted!');}
     }) 
