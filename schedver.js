@@ -43,6 +43,17 @@ app.get('/settings/all', (req, res) => {
     });
 });
 
+// update settings
+app.post('/settings/save', (req, res) => {
+    console.log('Received POST request on ' + req.url);
+    const toInsert = new settingsModel(req.body);
+    console.log('Updating settings: ' + JSON.stringify(toInsert));
+    settingsModel.findOneAndUpdate({}, toInsert, (err) => {
+        if (err) {res.status(500).send(err.message);}
+        else {res.status(200).send('Settings successfully updated!');}
+    });
+});
+
 const ScheduleSchema = new mongo.Schema({
     time: String,
     batch: String,
