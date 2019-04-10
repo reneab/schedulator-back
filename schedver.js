@@ -2,13 +2,19 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const mongo = require("mongoose");
+require('dotenv').config();
 
-const host = 'localhost:27017';
-const dbName = 'schedulator';
+const port = process.env.PORT || 3000;
 
-var db = mongo.connect("mongodb://" + host + "/" + dbName, (err, response) => {
+const dbHost = process.env.MONGO_DB || 'localhost:27017/schedulator';
+const dbUser = process.env.MONGO_DB_USER;
+const dbPass = process.env.MONGO_DB_PASS;
+
+const fullUrl = (dbUser && dbPass) ? "mongodb://" + dbUser + ":" + dbPass + "@" + dbHost : "mongodb://" + dbHost;
+
+var db = mongo.connect(fullUrl, (err, response) => {
     if (err) {console.log(err);}
-    else {console.log('Successfully connected to Mongodb!');}
+    else {console.log('Successfully connected to MongoDB on: ' + dbHost);}
 });
 
 var app = express();
@@ -142,6 +148,6 @@ app.delete('/schedules/:id', (req, res) => {
 });
 
 // launching the app
-app.listen('3000', function() {
-    console.log('Schedulator listening on port 3000...');
+app.listen(port, function() {
+    console.log('Schedulator listening on port ' + port);
 })
