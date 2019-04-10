@@ -6,15 +6,11 @@ require('dotenv').config();
 
 const port = process.env.PORT || 3000;
 
-const dbHost = process.env.MONGO_DB || 'localhost:27017/schedulator';
-const dbUser = process.env.MONGO_DB_USER;
-const dbPass = process.env.MONGO_DB_PASS;
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/schedulator';
 
-const fullUrl = (dbUser && dbPass) ? "mongodb://" + dbUser + ":" + dbPass + "@" + dbHost : "mongodb://" + dbHost;
-
-var db = mongo.connect(fullUrl, (err, response) => {
+var db = mongo.connect(mongoURI, (err, response) => {
     if (err) {console.log(err);}
-    else {console.log('Successfully connected to MongoDB on: ' + dbHost);}
+    else {console.log('Successfully connected to MongoDB!');}
 });
 
 var app = express();
