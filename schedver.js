@@ -117,7 +117,7 @@ app.post('/schedules/save', (req, res) => {
                 if (e.room == toInsert.room) {conflicts.push(e.room + ' is already taken')}
             });
             if (conflicts.length > 0) {
-                console.log('Found the following conflicts: ' + JSON.stringify(conflicts));
+                console.error('Found the following conflicts: ' + JSON.stringify(conflicts));
                 res.status(500).send(conflicts.join('. ') + '.');
             } else {
                 console.log('No conflicting record found. Inserting...');
