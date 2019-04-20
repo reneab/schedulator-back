@@ -168,9 +168,13 @@ function checkForConflicts(existingData, newElement, response, callback) {
 // deleting entry by ID
 app.delete('/schedules/:id', (req, res) => {
     console.log('Received DELETE request on ' + req.url);
+    console.log('Deleting entry with ID: ' + req.params.id);
     scheduleModel.deleteOne({_id: req.params.id}, err => {
         if (err) {res.status(500).send(err.message);}
-        else {res.status(200).send('Record successfully deleted!');}
+        else {
+            console.log('Record successfully deleted!');
+            res.status(200).send('Record successfully deleted!');
+        }
     }) 
 });
 
