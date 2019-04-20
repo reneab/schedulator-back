@@ -48,8 +48,9 @@ app.get('/settings/all', (req, res) => {
 // update settings
 app.post('/settings/save', (req, res) => {
     console.log('Received POST request on ' + req.url);
+    console.log(req.body);
     const toInsert = new settingsModel(req.body);
-    console.log('Updating settings: ' + JSON.stringify(toInsert));
+    console.log('Updating settings...');
     settingsModel.findOneAndUpdate({}, toInsert, (err) => {
         if (err) {res.status(500).send(err.message);}
         else {
@@ -103,23 +104,15 @@ app.get('/schedules/find', (req, res) => {
 
 // adding a new schedule entry
 app.post('/schedules/save', (req, res) => {
-    console.log('Received POST request on ' + req.url + ' with content ' + JSON.stringify(req.body));
+    console.log('Received POST request on ' + req.url + ' with content:');
+    console.log(req.body);
     const toInsert = new scheduleModel(req.body);
     
-    // Find first to see if no conflicts on the time slot
+    // Find first elements on the same timeslot to see if no conflicts
     scheduleModel.find({time: toInsert.time}, (err, data) => {
         if (err) {res.status(500).send(err.message);}
         else if (data) {
-            var conflicts = [];
-            data.forEach(e => {
-                if (e.teacher == toInsert.teacher) {conflicts.push(e.teacher + ' is already busy')}
-                if (e.batch === toInsert.batch) {conflicts.push('Batch ' + e.batch + ' is already busy')}
-                if (e.room == toInsert.room) {conflicts.push(e.room + ' is already taken')}
-            });
-            if (conflicts.length > 0) {
-                console.error('Found the following conflicts: ' + JSON.stringify(conflicts));
-                res.status(500).send(conflicts.join('. ') + '.');
-            } else {
+            checkForConflicts(data, toInsert, res, function() {
                 console.log('No conflicting record found. Inserting...');
                 toInsert.save((err, data) => {
                     if (err) {res.status(500).send(err.message);}
@@ -128,11 +121,49 @@ app.post('/schedules/save', (req, res) => {
                     	res.status(200).send('Successfully inserted!');
                     }
                 });
-            }
+            });
         }
     });
-
 });
+
+// updating an existing schedule entry
+app.post('/schedules/update/:id', (req, res) => {
+    console.log('Received POST request on ' + req.url + ' with content:');
+    console.log(req.body);
+    const toUpdate = req.body;
+    
+    // Find first elements on the same timeslot to see if no conflicts, EXCEPT the current item 
+    scheduleModel.find({time: toUpdate.time, _id: { $ne: req.params.id }}, (err, data) => {
+        if (err) {res.status(500).send(err.message);}
+        else if (data) {
+            checkForConflicts(data, toUpdate, res, function() {
+                console.log('No conflicts found. Updating...');
+                scheduleModel.findByIdAndUpdate(req.params.id, toUpdate, (err, result) => {
+                    if (err) {res.status(500).send(err.message);}
+                    else {
+                        console.log('Record successfully updated: ' + JSON.stringify(result));
+                        res.status(200).send('Successfully updated!');
+                    }
+                });
+            });
+        }
+    });
+});
+
+function checkForConflicts(existingData, newElement, response, callback) {
+    var conflicts = [];
+    existingData.forEach(e => {
+        if (e.teacher == newElement.teacher) {conflicts.push(e.teacher + ' is already busy')}
+        if (e.batch === newElement.batch) {conflicts.push('Batch ' + e.batch + ' is already busy')}
+        if (e.room == newElement.room) {conflicts.push(e.room + ' is already taken')}
+    });
+    if (conflicts.length > 0) {
+        console.error('Found the following conflicts: ' + JSON.stringify(conflicts));
+        response.status(500).send(conflicts.join('. ') + '.');
+    } else {
+        callback();
+    }
+}
 
 // deleting entry by ID
 app.delete('/schedules/:id', (req, res) => {
